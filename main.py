@@ -2,7 +2,7 @@ import re
 import string
 import time
 from typing import List
-
+from math import comb, perm
 import numpy as np
 from itertools import permutations
 
@@ -301,8 +301,25 @@ if __name__ == "__main__":
                     number_list = [x1, x2, x3, x4]
                     number_list_in_string = [str(number_i) for number_i in number_list]
                     has_answer, answers_in_str = search_answer(number_list, target, number_list_in_string)
+                    # calculate weight
+                    _remove_dup_num = len(set(number_list))
+                    if _remove_dup_num == 1:
+                        weight = perm(4, 4)
+                    elif _remove_dup_num == 4:
+                        weight = perm(4, 4) * (4 ** 4)
+                    elif _remove_dup_num == 3:
+                        weight = perm(4, 2) * (4 ** 2) * perm(4, 2)
+                    else:
+                        if x2 == x3:
+                            # a, a, a, b or a, b, b, b
+                            weight = perm(4, 1) * (4 ** 1) * perm(4, 3)
+                        else:
+                            # a, a, b, b
+                            weight = comb(4, 2) * perm(4, 2) * perm(4, 2)
+
                     if has_answer:
                         count_problems += 1
+                        # count_problems += weight
 
                         answers_remove_duplication = set()
 
@@ -316,13 +333,16 @@ if __name__ == "__main__":
                         #         all_answer_use_minus_and_div = False
                         # if len(answers_remove_duplication) == 1:
                         # if all_answer_use_minus_and_div:
-                        print(number_list)
-                        print(f"found {len(answers_remove_duplication)} answers:")
-                        print("\t" + "\n\t".join(answers_remove_duplication))
+                        # print(number_list)
+                        # print(f"found {len(answers_remove_duplication)} answers:")
+                        # print("\t" + "\n\t".join(answers_remove_duplication))
                     else:
                         count_dead_problems += 1
+                        # count_dead_problems += weight
+
 
 
     print("total problems:", count_problems)
     print("dead problems:", count_dead_problems)
+    print(f"ratio: {count_problems / (count_problems + count_dead_problems) * 100: 02.2f}%")
     print(f"cost time: {time.time() - start_time:.2f} s")
